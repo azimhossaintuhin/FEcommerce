@@ -11,17 +11,17 @@ class BaseModel(BASE):
     __abstract__ = True
     __allow_unmapped__ = True
 
+    id = Column(UUID, primary_key=True, index=True, default=uuid.uuid4)
+    created_at = Column(DateTime, default=func.now())
 class User(BaseModel):
     __tablename__ = "users"
 
-    id = Column(UUID, primary_key=True, index=True, default=uuid.uuid4)
     email = Column(String(), unique=True, index=True)
     password = Column(String)
     is_superuser = Column(Boolean(), default=False)
     is_staff = Column(Boolean(), default=False)
     is_verified = Column(Boolean(), default=False)
     token = relationship("Token", back_populates="user")
-    created_at = Column(DateTime, default=func.now())
     
     
     def save_password(self,password):
@@ -36,10 +36,9 @@ class User(BaseModel):
 class Token(BaseModel):
     __tablename__ = "tokens"
 
-    id = Column(UUID, primary_key=True, index=True, default=uuid.uuid4)
     user_id = Column(UUID, ForeignKey("users.id"), nullable=False)
     token = Column(String, nullable=False)
-    created_at = Column(DateTime, default=func.now())
+   
     expires_at = Column(DateTime, nullable=False)
     user = relationship("User", back_populates="token", foreign_keys=[user_id])
     
