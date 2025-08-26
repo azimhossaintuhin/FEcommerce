@@ -1,15 +1,20 @@
 from sqlalchemy.ext.asyncio import AsyncSession
-from sqlalchemy import select,insert,update,delete,func
-from app.models.User import User
-from app.schemas.Users import UserCreateSchema, UserReadSchema
+from sqlalchemy import select
+from app.models.User import User,UserProfile
+from app.schemas.Users import UserCreateSchema
+from app.utils.jwt_auth import create_token_pair 
+from app.schemas.jwt_token import TokenDataSchema
+import uuid
+
 
 
 
 class UserService:
-    async def get_all_users(self, session: AsyncSession):
-        result = await session.execute(select(User))
-        users = result.scalars().all()
-        return users
+    async def get_current_user(self, session: AsyncSession, user_id: int):
+        result = await session.execute(select(User).where(User.id == user_id))
+        user = result.scalars().one_or_none()
+        return user
+    
     
     async def get_user_by_id(self, session: AsyncSession, user_id: int):
         result = await session.execute(select(User).where(User.id == user_id))
@@ -35,6 +40,25 @@ class UserService:
             return True
         return False
     
+    async def get_user_priofile(self, session: AsyncSession, user_id):
+        print("user id",user_id)
+        user = select(UserProfile).where(UserProfile.user_id == user_id)
+        result = await session.execute(user)
+        user_profile = result.scalars().one_or_none()
+        print("user profile",user_profile)
+        return user_profile
     
+    async def login_user(self, session: AsyncSession, username: str, password: str):
+        result = await session.execute(select(User).where(User.username == username))
+        user = result.scalars().one_or_none()
+        if user and user.check_password(password):
+            token_data = TokenDataSchema(
+                userid=str(user.id),
+                username=user.username
+            )
+            tokens = create_token_pair(token_data,)
+            return tokens
+        return None
+
     
     
