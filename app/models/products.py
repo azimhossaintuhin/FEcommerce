@@ -30,6 +30,7 @@ class Product(BaseModel):
     category_id = Column(UUID(as_uuid=True), ForeignKey('categories.id',ondelete="CASCADE"), nullable=False)
     category = relationship("Category", back_populates="products")
     is_published = Column(Boolean, default=True)
+    product_gallery = relationship("ProductGallery", back_populates="product",)
 
     def __str__(self):
         return self.name    

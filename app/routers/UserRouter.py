@@ -11,8 +11,9 @@ from typing import List
 import uuid
 
 router = APIRouter(
-    prefix="/users",
+    prefix="/api/v1/users",
     tags=["users"]
+
 )
 
 user_service = UserService()

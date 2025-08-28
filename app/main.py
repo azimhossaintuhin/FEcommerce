@@ -1,11 +1,15 @@
 from  fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
-from app.routers import UserRouter,productRouter
+from app.routers import UserRouter,categoryRouter,productsRouter
 from app.events import userevents
-
+from  fastapi.staticfiles import StaticFiles
 app = FastAPI(
     
 )
+
+# add static files
+app.mount("/media", StaticFiles(directory="uploads"), name="media")
+
 
 app.add_middleware(CORSMiddleware,
                    allow_origins=["*"],
@@ -14,5 +18,6 @@ app.add_middleware(CORSMiddleware,
                    allow_headers=["*"],)
 
 
-app.include_router(UserRouter.router, prefix="/api/v1")
-app.include_router(productRouter.router)
+app.include_router(UserRouter.router)
+app.include_router(categoryRouter.router)
+app.include_router(productsRouter.router)

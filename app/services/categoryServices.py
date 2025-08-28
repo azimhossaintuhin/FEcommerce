@@ -5,9 +5,9 @@ from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy import select , insert, update, delete
 import uuid
 from typing import List, Optional
+from sqlalchemy.orm import selectinload
 
-
-class ProductService:
+class CategroyService:
     
     async def  create_category(self,category_data: CategoryINSchema, session: AsyncSession):
         category = Category(
@@ -49,4 +49,17 @@ class ProductService:
         await session.commit()
         return True
     
+    async def products_by_category(self, category_id: uuid.UUID, session: AsyncSession):
+        statement = (
+            select(Product)
+            .options(
+                selectinload(Product.product_gallery),
+                selectinload(Product.category)
+            )
+            .where(Product.category_id == category_id)
+        )
+
+        result = await session.execute(statement)  # <-- await here
+        products = result.scalars().all()          # get list of Product objects
+        return products
     
